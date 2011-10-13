@@ -1631,6 +1631,19 @@ class SchemaNode(object):
         if getattr(self, 'after_bind', None):
             self.after_bind(self, kw)
 
+    def freeze(self, paths):
+        """ Marks the schema nodes described by ``paths`` as frozen.
+        This function *clones* the schema it is called upon and
+        returns the cloned value.  The original schema node (the
+        source of the clone) is not modified."""
+        cloned = self.clone()
+        for path in paths:
+            node = cloned
+            for element in path.split('.'):
+                node = node[element]
+            node.frozen = True
+        return cloned
+
     def __delitem__(self, name):
         """ Remove a subnode by name """
         for idx, node in enumerate(self.children[:]):

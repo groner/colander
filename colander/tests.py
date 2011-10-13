@@ -2056,6 +2056,16 @@ class TestSchemaNode(unittest.TestCase):
         self.assertEqual(len(outer_clone.children), 0)
         self.assertEqual(len(outer_node.children), 1)
 
+    def test_freeze(self):
+        inner_typ = DummyType()
+        outer_typ = DummyType()
+        outer_node = self._makeOne(outer_typ, name='outer')
+        inner_node = self._makeOne(inner_typ, name='inner')
+        outer_node.children = [inner_node]
+        outer_clone = outer_node.freeze(['inner'])
+        self.failIf(outer_node is outer_clone)
+        self.failUnless(hasattr(outer_clone.children[0], 'frozen'))
+
 class TestDeferred(unittest.TestCase):
     def _makeOne(self, wrapped):
         from colander import deferred
