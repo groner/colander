@@ -563,6 +563,37 @@ class TestMapping(unittest.TestCase):
                          {'foo': 'bar', 'baz': 'baz'})
         self.assertEqual(typ.get_value(node1, appstruct, 'node2.foo'), 'bar')
 
+    def test_serialize_frozen(self):
+        typ = self._makeOne()
+        node = DummySchemaNode(typ, name='node')
+        node.children = [
+            DummySchemaNode(None, name='a'),
+            DummySchemaNode(None, name='b'),
+        ]
+        self.assertEqual(typ.serialize(node, {'a': 10, 'b': 11}),
+                {'a': 10, 'b': 11})
+
+    def test_deserialize_frozen(self):
+        typ = self._makeOne()
+        node = DummySchemaNode(typ, name='node')
+        node.children = [
+            DummySchemaNode(None, name='a'),
+            DummySchemaNode(None, name='b'),
+        ]
+        node.children[0].frozen = True
+        self.assertEqual(typ.deserialize(node, {'a': 10, 'b': 11}),
+                {'b': 11})
+
+    def test_deserialize_frozen_invalid(self):
+        typ = self._makeOne()
+        node = DummySchemaNode(typ, name='node')
+        node.children = [
+            DummySchemaNode(None, name='a', exc='Wrong'),
+            DummySchemaNode(None, name='b'),
+        ]
+        node.children[0].frozen = True
+        self.assertEqual(typ.deserialize(node, {'a': 10, 'b': 11}),
+                {'b': 11})
 
 class TestTuple(unittest.TestCase):
     def _makeOne(self):

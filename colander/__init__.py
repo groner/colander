@@ -436,11 +436,14 @@ class Mapping(SchemaType):
             name = subnode.name
             subval = value.pop(name, null)
             try:
-                result[name] = callback(subnode, subval)
+                subval = callback(subnode, subval)
             except Invalid, e:
                 if error is None:
                     error = Invalid(node)
                 error.add(e, num)
+
+            if subval is not _marker:
+                result[name] = subval
 
         if self.unknown == 'raise':
             if value:
@@ -472,6 +475,8 @@ class Mapping(SchemaType):
             return null
 
         def callback(subnode, subcstruct):
+            if getattr(subnode, 'frozen', False):
+                return _marker
             return subnode.deserialize(subcstruct)
 
         return self._impl(node, cstruct, callback)
