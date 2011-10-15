@@ -574,6 +574,7 @@ class TestMapping(unittest.TestCase):
                 {'a': 10, 'b': 11})
 
     def test_deserialize_frozen(self):
+        from colander import required
         typ = self._makeOne()
         node = DummySchemaNode(typ, name='node')
         node.children = [
@@ -581,10 +582,25 @@ class TestMapping(unittest.TestCase):
             DummySchemaNode(None, name='b'),
         ]
         node.children[0].frozen = True
+        node.children[0].missing = required
         self.assertEqual(typ.deserialize(node, {'a': 10, 'b': 11}),
                 {'b': 11})
 
+    def test_deserialize_frozen_missing(self):
+        from colander import required
+        typ = self._makeOne()
+        node = DummySchemaNode(typ, name='node')
+        node.children = [
+            DummySchemaNode(None, name='a'),
+            DummySchemaNode(None, name='b'),
+        ]
+        node.children[0].frozen = True
+        node.children[0].missing = 22
+        self.assertEqual(typ.deserialize(node, {'a': 10, 'b': 11}),
+                {'a': 22, 'b': 11})
+
     def test_deserialize_frozen_invalid(self):
+        from colander import required
         typ = self._makeOne()
         node = DummySchemaNode(typ, name='node')
         node.children = [
@@ -592,6 +608,7 @@ class TestMapping(unittest.TestCase):
             DummySchemaNode(None, name='b'),
         ]
         node.children[0].frozen = True
+        node.children[0].missing = required
         self.assertEqual(typ.deserialize(node, {'a': 10, 'b': 11}),
                 {'b': 11})
 

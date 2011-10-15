@@ -476,7 +476,7 @@ class Mapping(SchemaType):
 
         def callback(subnode, subcstruct):
             if getattr(subnode, 'frozen', False):
-                return _marker
+                return subnode.missing
             return subnode.deserialize(subcstruct)
 
         return self._impl(node, cstruct, callback)
